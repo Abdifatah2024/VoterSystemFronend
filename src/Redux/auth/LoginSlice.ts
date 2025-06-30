@@ -27,6 +27,33 @@ const initialState: LoginState = {
 };
 
 // ✅ LOGIN action
+// export const login = createAsyncThunk<
+//   LoginResponse,
+//   { email: string; password: string },
+//   { rejectValue: string }
+// >("auth/login", async (credentials, thunkAPI) => {
+//   try {
+//     const response = await axios.post<LoginResponse>(
+//       "https://votersystembackend.onrender.com/api/users/login",
+//       credentials
+//     );
+
+//     const token = response.data.Access_token;
+
+//     if (!token) {
+//       return thunkAPI.rejectWithValue("No token returned from server.");
+//     }
+
+//     // Save token to localStorage
+//     localStorage.setItem("Access_token", token);
+
+//     return { Access_token: token };
+//   } catch (error: any) {
+//     return thunkAPI.rejectWithValue(
+//       error.response?.data?.message || "Login failed"
+//     );
+//   }
+// });
 export const login = createAsyncThunk<
   LoginResponse,
   { email: string; password: string },
