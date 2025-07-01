@@ -13,7 +13,7 @@ const Header = () => {
     <header className="bg-gray-900 text-white shadow">
       <div className="container mx-auto flex items-center justify-between p-4">
         <div className="text-xl font-bold tracking-wide">
-          🗳️ VoterSystem
+          Barnaamijka Kaydinta Xogta Codbixiyaasha Muuse Dhimbil
         </div>
 
         <nav className="space-x-4">
