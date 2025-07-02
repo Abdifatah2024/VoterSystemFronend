@@ -11,6 +11,7 @@
 //   AiOutlineUp,
 //   AiOutlineMenu,
 //   AiOutlineClose,
+//   AiOutlineLock,
 // } from "react-icons/ai";
 // import type { RootState } from "../Redux/store";
 
@@ -30,10 +31,13 @@
 //     cityDistrict: "City and District",
 //     allList: "All List",
 //     searchClan: "Search Clan",
-//     users: "Users",
+//     voterManagement: "Manage Voters", // ✅ Added
+//     users: "Admin Users",
+//     userSelf: "My Account",
 //     createUser: "Create User",
 //     userList: "User List",
 //     adminResetPassword: "Admin Password Reset",
+//     changePassword: "Change Password",
 //   },
 //   so: {
 //     dashboard: "Dashboard-ka",
@@ -43,10 +47,13 @@
 //     cityDistrict: "Magaalo & Degmo",
 //     allList: "Dhammaan Liiska",
 //     searchClan: "Raadi Ardaaga",
-//     users: "Isticmaalayaasha",
+//     voterManagement: "Maamul Codbixiyeyaasha", // ✅ Added
+//     users: "Maamulayaasha",
+//     userSelf: "Akaawnkayga",
 //     createUser: "Abuur Isticmaale",
 //     userList: "Liiska Isticmaalayaasha",
 //     adminResetPassword: "Admin-ka Beddelka Furaha",
+//     changePassword: "Beddel Furaha",
 //   },
 // };
 
@@ -66,7 +73,6 @@
 //   const location = useLocation();
 //   const t = translations[lang];
 
-//   // Get token and decode
 //   const reduxToken = useSelector(
 //     (state: RootState) => state.loginSlice.data.Access_token
 //   );
@@ -106,7 +112,6 @@
 
 //   const toggleSidebar = () => setIsOpen(!isOpen);
 
-//   // Full menu
 //   const menuItems: MenuItem[] = [
 //     {
 //       titleKey: "dashboard",
@@ -117,62 +122,39 @@
 //       titleKey: "voters",
 //       icon: <AiOutlineTeam />,
 //       subItems: [
-//         {
-//           titleKey: "register",
-//           icon: <AiOutlineAppstore />,
-//           path: "/RegisterPerson",
-//         },
-//         {
-//           titleKey: "RegisterWithExcel",
-//           icon: <AiOutlineTeam />,
-//           path: "/RegisterEcxel",
-//         },
-//         {
-//           titleKey: "cityDistrict",
-//           icon: <AiOutlineTeam />,
-//           path: "/CityAndDistrict",
-//         },
-//         {
-//           titleKey: "allList",
-//           icon: <AiOutlineTeam />,
-//           path: "/ListAll",
-//         },
-//         {
-//           titleKey: "searchClan",
-//           icon: <AiOutlineTeam />,
-//           path: "/VoterByClan",
-//         },
+//         { titleKey: "register", icon: <AiOutlineAppstore />, path: "/RegisterPerson" },
+//         { titleKey: "RegisterWithExcel", icon: <AiOutlineTeam />, path: "/RegisterEcxel" },
+//         { titleKey: "cityDistrict", icon: <AiOutlineTeam />, path: "/CityAndDistrict" },
+//         { titleKey: "allList", icon: <AiOutlineTeam />, path: "/ListAll" },
+//         { titleKey: "searchClan", icon: <AiOutlineTeam />, path: "/VoterByClan" },
+//         ...(userRole === "ADMIN"
+//           ? [
+//               {
+//                 titleKey: "voterManagement",
+//                 icon: <AiOutlineTeam />,
+//                 path: "/voters/manage",
+//               },
+//             ]
+//           : []),
 //       ],
 //     },
+//     userRole === "ADMIN"
+//       ? {
+//           titleKey: "users",
+//           icon: <AiOutlineUser />,
+//           subItems: [
+//             { titleKey: "createUser", icon: <AiOutlineUser />, path: "/RegisterUser" },
+//             { titleKey: "userList", icon: <AiOutlineUser />, path: "/UserList" },
+//             { titleKey: "adminResetPassword", icon: <AiOutlineUser />, path: "/admin/reset-user-password" },
+//           ],
+//         }
+//       : null,
 //     {
-//       titleKey: "users",
-//       icon: <AiOutlineUser />,
-//       subItems: [
-//         { titleKey: "createUser", icon: <AiOutlineUser />, path: "/RegisterUser" },
-//         { titleKey: "userList", icon: <AiOutlineUser />, path: "/UserList" },
-//         { titleKey: "adminResetPassword", icon: <AiOutlineUser />, path: "/admin/reset-user-password" },
-//       ],
+//       titleKey: "changePassword",
+//       icon: <AiOutlineLock />,
+//       path: "/ChangePassword",
 //     },
-//   ];
-
-//   // Filter menu for USER role
-//   const filteredMenu =
-//     userRole === "USER"
-//       ? menuItems
-//           .map((item) => {
-//             if (item.titleKey === "users") {
-//               return null; // Hide Users section
-//             }
-//             if (item.titleKey === "voters") {
-//               const filteredSubItems = item.subItems?.filter((sub) =>
-//                 ["/RegisterPerson", "/RegisterEcxel"].includes(sub.path || "")
-//               );
-//               return { ...item, subItems: filteredSubItems };
-//             }
-//             return item;
-//           })
-//           .filter(Boolean) as MenuItem[]
-//       : menuItems;
+//   ].filter(Boolean) as MenuItem[];
 
 //   const toggleDropdown = (index: number) => {
 //     setOpenDropdowns((prev) => {
@@ -194,7 +176,6 @@
 //           isOpen ? "w-64" : "w-20"
 //         } fixed h-full shadow-lg z-50 transition-all`}
 //       >
-//         {/* Toggle & Language */}
 //         <div className="flex justify-between mb-6 items-center">
 //           {isOpen && (
 //             <select
@@ -214,10 +195,9 @@
 //           </button>
 //         </div>
 
-//         {/* Menu */}
 //         <nav className="flex flex-col h-full">
 //           <ul className="space-y-2 flex-1 overflow-y-auto">
-//             {filteredMenu.map((item, index) => (
+//             {menuItems.map((item, index) => (
 //               <li key={item.titleKey}>
 //                 {item.subItems ? (
 //                   <div className="relative">
@@ -241,13 +221,11 @@
 //                         </span>
 //                       )}
 //                     </button>
-
 //                     {!isOpen && hoveredItem === item.titleKey && (
 //                       <div className="absolute left-full ml-2 px-3 py-2 bg-blue-700 text-white text-sm rounded shadow z-50">
 //                         {t[item.titleKey]}
 //                       </div>
 //                     )}
-
 //                     {isOpen && openDropdowns[index] && (
 //                       <ul className="ml-6 mt-1 space-y-1 border-l-2 border-blue-600 pl-3">
 //                         {item.subItems.map((sub) => (
@@ -322,12 +300,14 @@ type MenuItem = {
 const translations = {
   en: {
     dashboard: "Dashboard",
+    demographics: "Demographics Dashboard", // ✅ Added
     voters: "Voters",
     register: "Register",
     RegisterWithExcel: "Register With Excel",
     cityDistrict: "City and District",
     allList: "All List",
     searchClan: "Search Clan",
+    voterManagement: "Manage Voters",
     users: "Admin Users",
     userSelf: "My Account",
     createUser: "Create User",
@@ -337,12 +317,14 @@ const translations = {
   },
   so: {
     dashboard: "Dashboard-ka",
+    demographics: "Dashboard-ka Tirakoobka", // ✅ Added
     voters: "Codbixiyeyaasha",
     register: "Diiwaan-geli",
     RegisterWithExcel: "Ku Diiwaan-geli Excel",
     cityDistrict: "Magaalo & Degmo",
     allList: "Dhammaan Liiska",
     searchClan: "Raadi Ardaaga",
+    voterManagement: "Maamul Codbixiyeyaasha",
     users: "Maamulayaasha",
     userSelf: "Akaawnkayga",
     createUser: "Abuur Isticmaale",
@@ -413,6 +395,13 @@ const SidebarLayout = () => {
       icon: <AiOutlineDashboard />,
       path: "/dashboard",
     },
+    userRole === "ADMIN"
+      ? {
+          titleKey: "demographics",
+          icon: <AiOutlineAppstore />,
+          path: "/demographics",
+        }
+      : null,
     {
       titleKey: "voters",
       icon: <AiOutlineTeam />,
@@ -422,6 +411,15 @@ const SidebarLayout = () => {
         { titleKey: "cityDistrict", icon: <AiOutlineTeam />, path: "/CityAndDistrict" },
         { titleKey: "allList", icon: <AiOutlineTeam />, path: "/ListAll" },
         { titleKey: "searchClan", icon: <AiOutlineTeam />, path: "/VoterByClan" },
+        ...(userRole === "ADMIN"
+          ? [
+              {
+                titleKey: "voterManagement",
+                icon: <AiOutlineTeam />,
+                path: "/voters/manage",
+              },
+            ]
+          : []),
       ],
     },
     userRole === "ADMIN"
@@ -462,7 +460,6 @@ const SidebarLayout = () => {
           isOpen ? "w-64" : "w-20"
         } fixed h-full shadow-lg z-50 transition-all`}
       >
-        {/* Toggle & Language */}
         <div className="flex justify-between mb-6 items-center">
           {isOpen && (
             <select
@@ -482,7 +479,6 @@ const SidebarLayout = () => {
           </button>
         </div>
 
-        {/* Menu */}
         <nav className="flex flex-col h-full">
           <ul className="space-y-2 flex-1 overflow-y-auto">
             {menuItems.map((item, index) => (
@@ -501,13 +497,7 @@ const SidebarLayout = () => {
                     >
                       <div className="flex items-center gap-3">
                         <span className="text-lg">{item.icon}</span>
-                        {isOpen && (
-                          <span>
-                            {item.titleKey === "users" && userRole === "USER"
-                              ? t.userSelf
-                              : t[item.titleKey]}
-                          </span>
-                        )}
+                        {isOpen && <span>{t[item.titleKey]}</span>}
                       </div>
                       {isOpen && (
                         <span className="text-sm">
@@ -517,9 +507,7 @@ const SidebarLayout = () => {
                     </button>
                     {!isOpen && hoveredItem === item.titleKey && (
                       <div className="absolute left-full ml-2 px-3 py-2 bg-blue-700 text-white text-sm rounded shadow z-50">
-                        {item.titleKey === "users" && userRole === "USER"
-                          ? t.userSelf
-                          : t[item.titleKey]}
+                        {t[item.titleKey]}
                       </div>
                     )}
                     {isOpen && openDropdowns[index] && (

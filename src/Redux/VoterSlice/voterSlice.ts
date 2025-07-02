@@ -8,7 +8,7 @@
 // export interface CreateVoterPayload {
 //   fullName: string;
 //   gender: string;
-//   dateOfBirth: string; // ISO string
+//   dateOfBirth: string;
 //   phoneNumber: string;
 //   city: string;
 //   district: string;
@@ -71,7 +71,7 @@
 //   voters: [],
 // };
 
-// // ✅ Create voter thunk
+// // ✅ Create voter
 // export const createVoter = createAsyncThunk<
 //   CreateVoterResponse,
 //   CreateVoterPayload,
@@ -101,6 +101,33 @@
 // >("voter/fetchAll", async (_, thunkAPI) => {
 //   try {
 //     const res = await axios.get<Voter[]>(`${BASE_API_URL}/api/voters`);
+//     return res.data;
+//   } catch (error: unknown) {
+//     if (axios.isAxiosError(error) && error.response) {
+//       return thunkAPI.rejectWithValue(
+//         error.response.data?.message || "Failed to load voters"
+//       );
+//     }
+//     return thunkAPI.rejectWithValue("Failed to load voters");
+//   }
+// });
+
+// // ✅ Fetch voters by clan
+// export const fetchVotersByClan = createAsyncThunk<
+//   Voter[],
+//   { clanTitle: string; clanSubtitle?: string },
+//   { rejectValue: string }
+// >("voter/fetchByClan", async ({ clanTitle, clanSubtitle }, thunkAPI) => {
+//   try {
+//     const params = new URLSearchParams();
+//     params.append("clanTitle", clanTitle);
+//     if (clanSubtitle) {
+//       params.append("clanSubtitle", clanSubtitle);
+//     }
+
+//     const res = await axios.get<Voter[]>(
+//       `${BASE_API_URL}/api/voters/by-clan?${params.toString()}`
+//     );
 //     return res.data;
 //   } catch (error: unknown) {
 //     if (axios.isAxiosError(error) && error.response) {
@@ -195,6 +222,20 @@
 //         state.voters = action.payload;
 //       })
 //       .addCase(fetchAllVoters.rejected, (state, action) => {
+//         state.loading = false;
+//         state.error = action.payload || "Failed to load voters";
+//       })
+
+//       // Fetch voters by clan
+//       .addCase(fetchVotersByClan.pending, (state) => {
+//         state.loading = true;
+//         state.error = null;
+//       })
+//       .addCase(fetchVotersByClan.fulfilled, (state, action) => {
+//         state.loading = false;
+//         state.voters = action.payload;
+//       })
+//       .addCase(fetchVotersByClan.rejected, (state, action) => {
 //         state.loading = false;
 //         state.error = action.payload || "Failed to load voters";
 //       })
@@ -306,6 +347,7 @@ interface VoterState {
   success: boolean;
   error: string | null;
   voters: Voter[];
+  selectedVoter: Voter | null;
 }
 
 // ✅ Initial state
@@ -314,6 +356,7 @@ const initialState: VoterState = {
   success: false,
   error: null,
   voters: [],
+  selectedVoter: null,
 };
 
 // ✅ Create voter
@@ -338,7 +381,7 @@ export const createVoter = createAsyncThunk<
   }
 });
 
-// ✅ Fetch all voters
+// ✅ Fetch all voters (full)
 export const fetchAllVoters = createAsyncThunk<
   Voter[],
   void,
@@ -354,6 +397,48 @@ export const fetchAllVoters = createAsyncThunk<
       );
     }
     return thunkAPI.rejectWithValue("Failed to load voters");
+  }
+});
+
+// ✅ Fetch all voters basic info
+export const fetchAllVotersBasicInfo = createAsyncThunk<
+  Voter[],
+  void,
+  { rejectValue: string }
+>("voter/fetchAllBasic", async (_, thunkAPI) => {
+  try {
+    const res = await axios.get<Voter[]>(
+      `${BASE_API_URL}/api/voters/voters/basic`
+    );
+    return res.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      return thunkAPI.rejectWithValue(
+        error.response.data?.message || "Failed to load voters"
+      );
+    }
+    return thunkAPI.rejectWithValue("Failed to load voters");
+  }
+});
+
+// ✅ Fetch single voter basic info
+export const fetchVoterBasicInfo = createAsyncThunk<
+  Voter,
+  number,
+  { rejectValue: string }
+>("voter/fetchBasic", async (voterId, thunkAPI) => {
+  try {
+    const res = await axios.get<Voter>(
+      `${BASE_API_URL}/api/voters/voters/${voterId}/basicinfo`
+    );
+    return res.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      return thunkAPI.rejectWithValue(
+        error.response.data?.message || "Failed to load voter"
+      );
+    }
+    return thunkAPI.rejectWithValue("Failed to load voter");
   }
 });
 
@@ -384,7 +469,7 @@ export const fetchVotersByClan = createAsyncThunk<
   }
 });
 
-// ✅ Update voter
+// ✅ Update voter (full)
 export const updateVoter = createAsyncThunk<
   UpdateVoterResponse,
   { voterId: number; data: Partial<CreateVoterPayload> },
@@ -392,7 +477,29 @@ export const updateVoter = createAsyncThunk<
 >("voter/update", async ({ voterId, data }, thunkAPI) => {
   try {
     const res = await axios.put<UpdateVoterResponse>(
-      `${BASE_API_URL}/api/voters/${voterId}`,
+      `${BASE_API_URL}/api/voters/voters/${voterId}`,
+      data
+    );
+    return res.data;
+  } catch (error: unknown) {
+    if (axios.isAxiosError(error) && error.response) {
+      return thunkAPI.rejectWithValue(
+        error.response.data?.message || "Failed to update voter"
+      );
+    }
+    return thunkAPI.rejectWithValue("Failed to update voter");
+  }
+});
+
+// ✅ Update voter basic info
+export const updateVoterBasicInfo = createAsyncThunk<
+  UpdateVoterResponse,
+  { voterId: number; data: Partial<Voter> },
+  { rejectValue: string }
+>("voter/updateBasic", async ({ voterId, data }, thunkAPI) => {
+  try {
+    const res = await axios.put<UpdateVoterResponse>(
+      `${BASE_API_URL}/api/voters/voters/${voterId}/basic`,
       data
     );
     return res.data;
@@ -436,6 +543,7 @@ export const voterSlice = createSlice({
       state.loading = false;
       state.success = false;
       state.error = null;
+      state.selectedVoter = null;
     },
   },
   extraReducers: (builder) => {
@@ -471,6 +579,35 @@ export const voterSlice = createSlice({
         state.error = action.payload || "Failed to load voters";
       })
 
+      // Fetch all voters basic info
+      .addCase(fetchAllVotersBasicInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllVotersBasicInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.voters = action.payload;
+      })
+      .addCase(fetchAllVotersBasicInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to load voters";
+      })
+
+      // Fetch single voter basic info
+      .addCase(fetchVoterBasicInfo.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.selectedVoter = null;
+      })
+      .addCase(fetchVoterBasicInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedVoter = action.payload;
+      })
+      .addCase(fetchVoterBasicInfo.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to load voter";
+      })
+
       // Fetch voters by clan
       .addCase(fetchVotersByClan.pending, (state) => {
         state.loading = true;
@@ -485,7 +622,7 @@ export const voterSlice = createSlice({
         state.error = action.payload || "Failed to load voters";
       })
 
-      // Update voter
+      // Update voter (full)
       .addCase(updateVoter.pending, (state) => {
         state.loading = true;
         state.success = false;
@@ -502,6 +639,31 @@ export const voterSlice = createSlice({
         }
       })
       .addCase(updateVoter.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
+        state.error = action.payload || "Failed to update voter";
+      })
+
+      // Update voter basic
+      .addCase(updateVoterBasicInfo.pending, (state) => {
+        state.loading = true;
+        state.success = false;
+        state.error = null;
+      })
+      .addCase(updateVoterBasicInfo.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        const index = state.voters.findIndex(
+          (v) => v.id === action.payload.voter.id
+        );
+        if (index !== -1) {
+          state.voters[index] = action.payload.voter;
+        }
+        if (state.selectedVoter?.id === action.payload.voter.id) {
+          state.selectedVoter = action.payload.voter;
+        }
+      })
+      .addCase(updateVoterBasicInfo.rejected, (state, action) => {
         state.loading = false;
         state.success = false;
         state.error = action.payload || "Failed to update voter";

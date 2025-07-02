@@ -7,6 +7,7 @@ import voterReducer from "./VoterSlice/voterSlice";
 import voterSummaryReducer from "./VoterSlice/voterSummarySlice";
 import voterUploadReducer from "../Redux/VoterSlice/voterUploadSlice";
 import changePasswordReducer from "../Redux/User/changePasswordSlice";
+import demographicsReducer from "../Redux/VoterSlice/demographicsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     voterSummary: voterSummaryReducer,
     voterUpload: voterUploadReducer,
     changePassword: changePasswordReducer,
+    demographicsSlice: demographicsReducer,
   },
   devTools: true,
 });

@@ -113,7 +113,7 @@ const RegisterVoter = () => {
   const navigate = useNavigate();
   const { loading, success, error } = useAppSelector((state) => state.voter);
 
-const [language, setLanguage] = useState<Language>("so");
+  const [language, setLanguage] = useState<Language>("so");
   const t = translations[language];
 
   const [form, setForm] = useState({
@@ -196,7 +196,7 @@ const [language, setLanguage] = useState<Language>("so");
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-200 flex items-center justify-center p-4 font-inter">
       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-6 border border-gray-100">
         {/* Language Selector */}
-        <div className="flex justify-end mb-2 col-span-2">
+        <div className="flex justify-end mb-2">
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as Language)}
@@ -208,30 +208,30 @@ const [language, setLanguage] = useState<Language>("so");
         </div>
 
         {/* Header */}
-        <div className="mb-6 text-center col-span-2">
+        <div className="mb-6 text-center">
           <FiUserPlus className="text-blue-500 text-5xl mx-auto mb-3" />
           <h2 className="text-2xl font-bold text-gray-900">{t.title}</h2>
           <p className="text-gray-600 text-sm">{t.subtitle}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-6">
-          {/* Each field */}
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Text Inputs */}
           {[
-            { name: "fullName", type: "text", label: t.fullName, placeholder: t.fullName },
-            { name: "age", type: "number", label: t.age, placeholder: t.age },
-            { name: "phoneNumber", type: "text", label: t.phone, placeholder: t.phone },
-            { name: "address", type: "text", label: t.address, placeholder: t.address },
+            { name: "fullName", type: "text", label: t.fullName },
+            { name: "age", type: "number", label: t.age },
+            { name: "phoneNumber", type: "text", label: t.phone },
+            { name: "address", type: "text", label: t.address },
           ].map((field) => (
             <div key={field.name}>
               <label className="block text-sm font-medium mb-1">{field.label}</label>
               <input
                 name={field.name}
                 type={field.type}
-                placeholder={field.placeholder}
+                placeholder={field.label}
                 value={(form as any)[field.name]}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg placeholder-gray-500"
+                className="w-full px-3 py-2.5 border border-gray-200 rounded-lg"
               />
             </div>
           ))}
@@ -367,7 +367,7 @@ const [language, setLanguage] = useState<Language>("so");
           )}
 
           {/* Checkboxes */}
-          <div className="col-span-2 flex flex-wrap gap-4">
+          <div className="col-span-1 md:col-span-2 flex flex-wrap gap-4">
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -388,9 +388,9 @@ const [language, setLanguage] = useState<Language>("so");
             </label>
           </div>
 
-          {/* Registered/New Registration Place */}
+          {/* Registered / New Registration Place */}
           {form.hasVoterId ? (
-            <div className="col-span-2">
+            <div className="col-span-1 md:col-span-2">
               <label className="block text-sm font-medium mb-1">{t.registeredPlace}</label>
               <input
                 name="registeredPlace"
@@ -403,7 +403,7 @@ const [language, setLanguage] = useState<Language>("so");
               />
             </div>
           ) : (
-            <div className="col-span-2">
+            <div className="col-span-1 md:col-span-2">
               <label className="block text-sm font-medium mb-1">{t.newRegistrationPlace}</label>
               <input
                 name="newRegistrationPlace"
@@ -419,7 +419,7 @@ const [language, setLanguage] = useState<Language>("so");
 
           {/* Desired Registration Place */}
           {form.wantsToChangeRegistration && (
-            <div className="col-span-2">
+            <div className="col-span-1 md:col-span-2">
               <label className="block text-sm font-medium mb-1">{t.desiredRegistrationPlace}</label>
               <input
                 name="desiredRegistrationPlace"
@@ -434,7 +434,7 @@ const [language, setLanguage] = useState<Language>("so");
           )}
 
           {/* Submit */}
-          <div className="col-span-2">
+          <div className="col-span-1 md:col-span-2">
             <button
               type="submit"
               disabled={loading}

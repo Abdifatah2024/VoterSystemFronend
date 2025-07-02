@@ -73,6 +73,8 @@ import CityDistrictReportComponent from "./pages/Voters/CityDistrictReportCompon
 import VoterList from "./pages/Voters/VoterList";
 import VoterClanSearch from "./pages/Voters/VoterClanSearch";
 import ResetUserPassword from "./pages/User/ResetUserPassword";
+import VoterManagement from "./pages/Voters/VoterManagement";
+import DemographicsDashboard from "./pages/Voters/DemographicsDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -118,6 +120,9 @@ export const router = createBrowserRouter([
               { path: "VoterByClan", element: <VoterClanSearch /> },
                  { path: "ListAll", element: <VoterList /> },
               { path: "UserList", element: <UserList /> },
+              { path: "voters/manage", element: <VoterManagement /> },
+              { path: "demographics", element: <DemographicsDashboard /> },
+              
             ],
           },
         ],
