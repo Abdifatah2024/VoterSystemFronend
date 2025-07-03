@@ -361,10 +361,7 @@ const SuccessMessage = styled(Message)`
 `;
 const FileInfo = styled.div``;
 const Spinner = styled.div``;
-const RequiredFieldIndicator = styled.span`
-  color: #ef4444;
-  margin-left: 2px;
-`;
+
 
 const UploadVoters = () => {
   const dispatch = useDispatch<AppDispatch>();
