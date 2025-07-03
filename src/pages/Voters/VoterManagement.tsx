@@ -115,23 +115,31 @@ const VoterManagement: React.FC = () => {
     }));
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type, checked } = e.target;
-    if (name === "city") {
-      setEditData({
-        ...editData,
-        city: value,
-        district: "",
-      });
-    } else {
-      setEditData({
-        ...editData,
-        [name]: type === "checkbox" ? checked : value,
-      });
-    }
-  };
+ const handleChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+) => {
+  const { name, value, type } = e.target;
+
+  if (name === "city") {
+    setEditData({
+      ...editData,
+      city: value,
+      district: "",
+    });
+  } else if (type === "checkbox") {
+    const target = e.target as HTMLInputElement;
+    setEditData({
+      ...editData,
+      [name]: target.checked,
+    });
+  } else {
+    setEditData({
+      ...editData,
+      [name]: value,
+    });
+  }
+};
+
 
   const handleUpdate = () => {
     if (!selectedVoter) return;

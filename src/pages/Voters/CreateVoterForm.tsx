@@ -108,7 +108,25 @@
 
 // type Language = "en" | "so";
 
-// const RegisterVoter = () => {
+// interface VoterFormState {
+//   fullName: string;
+//   gender: string;
+//   age: string;
+//   phoneNumber: string;
+//   city: string;
+//   otherCity: string;
+//   district: string;
+//   address: string;
+//   hasVoterId: boolean;
+//   registeredPlace: string;
+//   wantsToChangeRegistration: boolean;
+//   newRegistrationPlace: string;
+//   desiredRegistrationPlace: string;
+//   clanTitle: string;
+//   clanSubtitle: string;
+// }
+
+// const RegisterVoter: React.FC = () => {
 //   const dispatch = useAppDispatch();
 //   const navigate = useNavigate();
 //   const { loading, success, error } = useAppSelector((state) => state.voter);
@@ -116,7 +134,7 @@
 //   const [language, setLanguage] = useState<Language>("so");
 //   const t = translations[language];
 
-//   const [form, setForm] = useState({
+//   const [form, setForm] = useState<VoterFormState>({
 //     fullName: "",
 //     gender: "",
 //     age: "",
@@ -145,39 +163,37 @@
 //     }
 //   }, [success, error, navigate, dispatch, t.success]);
 
-//  const handleChange = (
-//   e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-// ) => {
-//   const { name, value, type } = e.target;
+//   const handleChange = (
+//     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+//   ) => {
+//     const { name, value, type } = e.target;
 
-//   if (name === "city") {
-//     setForm({
-//       ...form,
-//       city: value,
-//       otherCity: "",
-//       district: "",
-//     });
-//   } else if (name === "clanTitle") {
-//     setForm({
-//       ...form,
-//       clanTitle: value,
-//       clanSubtitle: "",
-//     });
-//   } else if (type === "checkbox") {
-//     // TypeScript knows e.target is HTMLInputElement
-//     const target = e.target as HTMLInputElement;
-//     setForm({
-//       ...form,
-//       [name]: target.checked,
-//     });
-//   } else {
-//     setForm({
-//       ...form,
-//       [name]: value,
-//     });
-//   }
-// };
-
+//     if (name === "city") {
+//       setForm({
+//         ...form,
+//         city: value,
+//         otherCity: "",
+//         district: "",
+//       });
+//     } else if (name === "clanTitle") {
+//       setForm({
+//         ...form,
+//         clanTitle: value,
+//         clanSubtitle: "",
+//       });
+//     } else if (type === "checkbox") {
+//       const target = e.target as HTMLInputElement;
+//       setForm({
+//         ...form,
+//         [name]: target.checked,
+//       });
+//     } else {
+//       setForm({
+//         ...form,
+//         [name]: value,
+//       });
+//     }
+//   };
 
 //   const handleSubmit = (e: React.FormEvent) => {
 //     e.preventDefault();
@@ -224,7 +240,6 @@
 //         </div>
 
 //         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//           {/* Text Inputs */}
 //           {[
 //             { name: "fullName", type: "text", label: t.fullName },
 //             { name: "age", type: "number", label: t.age },
@@ -237,7 +252,7 @@
 //                 name={field.name}
 //                 type={field.type}
 //                 placeholder={field.label}
-//                 value={(form as any)[field.name]}
+//                 value={form[field.name as keyof VoterFormState]}
 //                 onChange={handleChange}
 //                 required
 //                 className="w-full px-3 py-2.5 border border-gray-200 rounded-lg"
@@ -397,7 +412,7 @@
 //             </label>
 //           </div>
 
-//           {/* Registered / New Registration Place */}
+//           {/* Registered/New Registration Place */}
 //           {form.hasVoterId ? (
 //             <div className="col-span-1 md:col-span-2">
 //               <label className="block text-sm font-medium mb-1">{t.registeredPlace}</label>
@@ -426,7 +441,6 @@
 //             </div>
 //           )}
 
-//           {/* Desired Registration Place */}
 //           {form.wantsToChangeRegistration && (
 //             <div className="col-span-1 md:col-span-2">
 //               <label className="block text-sm font-medium mb-1">{t.desiredRegistrationPlace}</label>
@@ -621,20 +635,19 @@ const RegisterVoter: React.FC = () => {
 
   useEffect(() => {
     if (success) {
-      toast.success(t.success, { duration: 3000 });
+      toast.success(t.success);
       dispatch(clearVoterState());
       navigate("/ListAll");
     }
     if (error) {
-      toast.error(error, { duration: 5000 });
+      toast.error(error);
     }
-  }, [success, error, navigate, dispatch, t.success]);
+  }, [success, error, dispatch, navigate, t.success]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-
     if (name === "city") {
       setForm({
         ...form,
@@ -687,7 +700,6 @@ const RegisterVoter: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-200 flex items-center justify-center p-4 font-inter">
       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-        {/* Language Selector */}
         <div className="flex justify-end mb-2">
           <select
             value={language}
@@ -699,7 +711,6 @@ const RegisterVoter: React.FC = () => {
           </select>
         </div>
 
-        {/* Header */}
         <div className="mb-6 text-center">
           <FiUserPlus className="text-blue-500 text-5xl mx-auto mb-3" />
           <h2 className="text-2xl font-bold text-gray-900">{t.title}</h2>
@@ -719,7 +730,7 @@ const RegisterVoter: React.FC = () => {
                 name={field.name}
                 type={field.type}
                 placeholder={field.label}
-                value={form[field.name as keyof VoterFormState]}
+                value={form[field.name as keyof VoterFormState] as string}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2.5 border border-gray-200 rounded-lg"
@@ -879,7 +890,7 @@ const RegisterVoter: React.FC = () => {
             </label>
           </div>
 
-          {/* Registered/New Registration Place */}
+          {/* Registration Place */}
           {form.hasVoterId ? (
             <div className="col-span-1 md:col-span-2">
               <label className="block text-sm font-medium mb-1">{t.registeredPlace}</label>
