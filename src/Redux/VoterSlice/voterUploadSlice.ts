@@ -63,10 +63,10 @@ export const uploadVotersExcel = createAsyncThunk<
   } catch (error) {
     if (error instanceof AxiosError) {
       return rejectWithValue(
-        error.response?.data?.message || DEFAULT_ERROR_MESSAGE
+        error.response?.data?.message || "An unexpected error occurred."
       );
     }
-    return rejectWithValue(DEFAULT_ERROR_MESSAGE);
+    return rejectWithValue("An unexpected error occurred.");
   }
 });
 
