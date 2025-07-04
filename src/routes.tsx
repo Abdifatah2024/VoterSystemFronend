@@ -75,6 +75,7 @@ import VoterClanSearch from "./pages/Voters/VoterClanSearch";
 import ResetUserPassword from "./pages/User/ResetUserPassword";
 import VoterManagement from "./pages/Voters/VoterManagement";
 import DemographicsDashboard from "./pages/Voters/DemographicsDashboard";
+import UsersVotersSummary from "./pages/User/UsersVotersSummary";
 
 export const router = createBrowserRouter([
   {
@@ -122,6 +123,7 @@ export const router = createBrowserRouter([
               { path: "UserList", element: <UserList /> },
               { path: "voters/manage", element: <VoterManagement /> },
               { path: "demographics", element: <DemographicsDashboard /> },
+              { path: "UserRegSummary", element: <UsersVotersSummary/> },
               
             ],
           },

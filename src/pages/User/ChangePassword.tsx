@@ -16,7 +16,7 @@ const ChangePassword = () => {
       toast.success("Password changed successfully. Please log in again.");
       dispatch(clearChangePasswordState());
       setTimeout(() => {
-        navigate("/login");
+        navigate("/dashboard");
       }, 1500); // Delay to allow the toast to appear
     }
     if (error) {

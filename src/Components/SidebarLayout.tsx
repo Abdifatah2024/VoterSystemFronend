@@ -25,13 +25,15 @@
 // const translations = {
 //   en: {
 //     dashboard: "Dashboard",
+//     demographics: "Demographics Dashboard",
 //     voters: "Voters",
 //     register: "Register",
-//     RegisterWithExcel: "Register With Excel",
+//     excelRegistration: "Excel Registration",
+//     userRegMonitor: "User Registration Monitor",
 //     cityDistrict: "City and District",
 //     allList: "All List",
 //     searchClan: "Search Clan",
-//     voterManagement: "Manage Voters", // ✅ Added
+//     voterManagement: "Manage Voters",
 //     users: "Admin Users",
 //     userSelf: "My Account",
 //     createUser: "Create User",
@@ -41,13 +43,15 @@
 //   },
 //   so: {
 //     dashboard: "Dashboard-ka",
+//     demographics: "Dashboard-ka Tirakoobka",
 //     voters: "Codbixiyeyaasha",
 //     register: "Diiwaan-geli",
-//     RegisterWithExcel: "Ku Diiwaan-geli Excel",
+//     excelRegistration: "Diiwaangelinta Excel",
+//     userRegMonitor: "Kormeerka Diiwaangelinta Isticmaalaha",
 //     cityDistrict: "Magaalo & Degmo",
 //     allList: "Dhammaan Liiska",
 //     searchClan: "Raadi Ardaaga",
-//     voterManagement: "Maamul Codbixiyeyaasha", // ✅ Added
+//     voterManagement: "Maamul Codbixiyeyaasha",
 //     users: "Maamulayaasha",
 //     userSelf: "Akaawnkayga",
 //     createUser: "Abuur Isticmaale",
@@ -118,12 +122,20 @@
 //       icon: <AiOutlineDashboard />,
 //       path: "/dashboard",
 //     },
+//     userRole === "ADMIN"
+//       ? {
+//           titleKey: "demographics",
+//           icon: <AiOutlineAppstore />,
+//           path: "/demographics",
+//         }
+//       : null,
 //     {
 //       titleKey: "voters",
 //       icon: <AiOutlineTeam />,
 //       subItems: [
 //         { titleKey: "register", icon: <AiOutlineAppstore />, path: "/RegisterPerson" },
-//         { titleKey: "RegisterWithExcel", icon: <AiOutlineTeam />, path: "/RegisterEcxel" },
+//         { titleKey: "excelRegistration", icon: <AiOutlineTeam />, path: "/RegisterExcel" },
+//         { titleKey: "userRegMonitor", icon: <AiOutlineTeam />, path: "/UserRegSummary" },
 //         { titleKey: "cityDistrict", icon: <AiOutlineTeam />, path: "/CityAndDistrict" },
 //         { titleKey: "allList", icon: <AiOutlineTeam />, path: "/ListAll" },
 //         { titleKey: "searchClan", icon: <AiOutlineTeam />, path: "/VoterByClan" },
@@ -145,7 +157,11 @@
 //           subItems: [
 //             { titleKey: "createUser", icon: <AiOutlineUser />, path: "/RegisterUser" },
 //             { titleKey: "userList", icon: <AiOutlineUser />, path: "/UserList" },
-//             { titleKey: "adminResetPassword", icon: <AiOutlineUser />, path: "/admin/reset-user-password" },
+//             {
+//               titleKey: "adminResetPassword",
+//               icon: <AiOutlineUser />,
+//               path: "/admin/reset-user-password",
+//             },
 //           ],
 //         }
 //       : null,
@@ -196,7 +212,7 @@
 //         </div>
 
 //         <nav className="flex flex-col h-full">
-//           <ul className="space-y-2 flex-1 overflow-y-auto">
+//           <ul className="space-y-2 flex-1 overflow-y-auto pr-1">
 //             {menuItems.map((item, index) => (
 //               <li key={item.titleKey}>
 //                 {item.subItems ? (
@@ -227,7 +243,7 @@
 //                       </div>
 //                     )}
 //                     {isOpen && openDropdowns[index] && (
-//                       <ul className="ml-6 mt-1 space-y-1 border-l-2 border-blue-600 pl-3">
+//                       <ul className="ml-6 mt-1 max-h-60 overflow-y-auto space-y-1 border-l-2 border-blue-600 pl-3">
 //                         {item.subItems.map((sub) => (
 //                           <li key={sub.titleKey}>
 //                             <Link
@@ -284,8 +300,6 @@ import {
   AiOutlineAppstore,
   AiOutlineDown,
   AiOutlineUp,
-  AiOutlineMenu,
-  AiOutlineClose,
   AiOutlineLock,
 } from "react-icons/ai";
 import type { RootState } from "../Redux/store";
@@ -300,16 +314,16 @@ type MenuItem = {
 const translations = {
   en: {
     dashboard: "Dashboard",
-    demographics: "Demographics Dashboard", // ✅ Added
+    demographics: "Demographics Dashboard",
     voters: "Voters",
     register: "Register",
-    RegisterWithExcel: "Register With Excel",
+    excelRegistration: "Excel Registration",
+    userRegMonitor: "User Registration Monitor",
     cityDistrict: "City and District",
     allList: "All List",
     searchClan: "Search Clan",
     voterManagement: "Manage Voters",
-    users: "Admin Users",
-    userSelf: "My Account",
+    users: "Users",
     createUser: "Create User",
     userList: "User List",
     adminResetPassword: "Admin Password Reset",
@@ -317,16 +331,16 @@ const translations = {
   },
   so: {
     dashboard: "Dashboard-ka",
-    demographics: "Dashboard-ka Tirakoobka", // ✅ Added
+    demographics: "Dashboard-ka Tirakoobka",
     voters: "Codbixiyeyaasha",
     register: "Diiwaan-geli",
-    RegisterWithExcel: "Ku Diiwaan-geli Excel",
+    excelRegistration: "Diiwaangelinta Excel",
+    userRegMonitor: "Kormeerka Diiwaangelinta Isticmaalaha",
     cityDistrict: "Magaalo & Degmo",
     allList: "Dhammaan Liiska",
     searchClan: "Raadi Ardaaga",
     voterManagement: "Maamul Codbixiyeyaasha",
-    users: "Maamulayaasha",
-    userSelf: "Akaawnkayga",
+    users: "Isticmaalayaasha",
     createUser: "Abuur Isticmaale",
     userList: "Liiska Isticmaalayaasha",
     adminResetPassword: "Admin-ka Beddelka Furaha",
@@ -342,7 +356,7 @@ interface JwtPayload {
 }
 
 const SidebarLayout = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [openDropdowns, setOpenDropdowns] = useState<boolean[]>([]);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
   const [lang, setLang] = useState<"so" | "en">("so");
@@ -365,30 +379,6 @@ const SidebarLayout = () => {
     }
   }
 
-  useEffect(() => {
-    const handleResize = () => setIsOpen(window.innerWidth >= 1024);
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target as Node) &&
-        window.innerWidth < 1024
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    document.addEventListener("mousedown", handleClickOutside);
-    handleResize();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  const toggleSidebar = () => setIsOpen(!isOpen);
-
   const menuItems: MenuItem[] = [
     {
       titleKey: "dashboard",
@@ -407,7 +397,7 @@ const SidebarLayout = () => {
       icon: <AiOutlineTeam />,
       subItems: [
         { titleKey: "register", icon: <AiOutlineAppstore />, path: "/RegisterPerson" },
-        { titleKey: "RegisterWithExcel", icon: <AiOutlineTeam />, path: "/RegisterEcxel" },
+        { titleKey: "excelRegistration", icon: <AiOutlineTeam />, path: "/RegisterExcel" },
         { titleKey: "cityDistrict", icon: <AiOutlineTeam />, path: "/CityAndDistrict" },
         { titleKey: "allList", icon: <AiOutlineTeam />, path: "/ListAll" },
         { titleKey: "searchClan", icon: <AiOutlineTeam />, path: "/VoterByClan" },
@@ -422,17 +412,28 @@ const SidebarLayout = () => {
           : []),
       ],
     },
-    userRole === "ADMIN"
-      ? {
-          titleKey: "users",
-          icon: <AiOutlineUser />,
-          subItems: [
-            { titleKey: "createUser", icon: <AiOutlineUser />, path: "/RegisterUser" },
-            { titleKey: "userList", icon: <AiOutlineUser />, path: "/UserList" },
-            { titleKey: "adminResetPassword", icon: <AiOutlineUser />, path: "/admin/reset-user-password" },
-          ],
-        }
-      : null,
+    {
+      titleKey: "users",
+      icon: <AiOutlineUser />,
+      subItems: [
+        ...(userRole === "ADMIN"
+          ? [
+              { titleKey: "createUser", icon: <AiOutlineUser />, path: "/RegisterUser" },
+              { titleKey: "userList", icon: <AiOutlineUser />, path: "/UserList" },
+              {
+                titleKey: "adminResetPassword",
+                icon: <AiOutlineUser />,
+                path: "/admin/reset-user-password",
+              },
+            ]
+          : []),
+        {
+          titleKey: "userRegMonitor",
+          icon: <AiOutlineTeam />,
+          path: "/UserRegSummary",
+        },
+      ],
+    },
     {
       titleKey: "changePassword",
       icon: <AiOutlineLock />,
@@ -456,12 +457,14 @@ const SidebarLayout = () => {
     <div className="flex min-h-screen bg-gray-50">
       <div
         ref={sidebarRef}
+        onMouseEnter={() => setIsOpen(true)}
+        onMouseLeave={() => setIsOpen(false)}
         className={`bg-blue-700 text-white p-5 pt-8 duration-300 ${
           isOpen ? "w-64" : "w-20"
         } fixed h-full shadow-lg z-50 transition-all`}
       >
-        <div className="flex justify-between mb-6 items-center">
-          {isOpen && (
+        {isOpen && (
+          <div className="flex justify-between mb-6 items-center">
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as "so" | "en")}
@@ -470,17 +473,11 @@ const SidebarLayout = () => {
               <option value="so">Af-Soomaali</option>
               <option value="en">English</option>
             </select>
-          )}
-          <button
-            onClick={toggleSidebar}
-            className="text-xl p-2 hover:bg-blue-600 rounded-lg"
-          >
-            {isOpen ? <AiOutlineClose /> : <AiOutlineMenu />}
-          </button>
-        </div>
+          </div>
+        )}
 
         <nav className="flex flex-col h-full">
-          <ul className="space-y-2 flex-1 overflow-y-auto">
+          <ul className="space-y-2 flex-1 overflow-y-auto pr-1">
             {menuItems.map((item, index) => (
               <li key={item.titleKey}>
                 {item.subItems ? (
@@ -511,7 +508,7 @@ const SidebarLayout = () => {
                       </div>
                     )}
                     {isOpen && openDropdowns[index] && (
-                      <ul className="ml-6 mt-1 space-y-1 border-l-2 border-blue-600 pl-3">
+                      <ul className="ml-6 mt-1 max-h-60 overflow-y-auto space-y-1 border-l-2 border-blue-600 pl-3">
                         {item.subItems.map((sub) => (
                           <li key={sub.titleKey}>
                             <Link

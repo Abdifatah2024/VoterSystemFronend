@@ -39,7 +39,7 @@ const translations = {
   so: {
     title: "Tirakoobka Diiwaangelinta Cod-bixiyeyaasha Somaliland",
     totalVoters: "Falanqeyn dhamaystiran oo diiwaangelinta cod-bixiyeyaasha",
-    genderRatio: "Qaybinta Jinsiga",
+    genderRatio: "JINSIGA",
     male: "Rag",
     female: "Dumar",
     withVoterID: "Leh Kaarka Cod-bixiyaha",
