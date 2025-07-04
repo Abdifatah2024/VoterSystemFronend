@@ -315,7 +315,7 @@
 // export const { clearRegisterState } = userRegisterSlice.actions;
 // export default userRegisterSlice.reducer;
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
 export const BASE_API_URL = import.meta.env.VITE_API_URL;
 
