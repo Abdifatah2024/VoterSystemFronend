@@ -154,20 +154,19 @@
 
 //   useEffect(() => {
 //     if (success) {
-//       toast.success(t.success, { duration: 3000 });
+//       toast.success(t.success);
 //       dispatch(clearVoterState());
 //       navigate("/ListAll");
 //     }
 //     if (error) {
-//       toast.error(error, { duration: 5000 });
+//       toast.error(error);
 //     }
-//   }, [success, error, navigate, dispatch, t.success]);
+//   }, [success, error, dispatch, navigate, t.success]);
 
 //   const handleChange = (
 //     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
 //   ) => {
 //     const { name, value, type } = e.target;
-
 //     if (name === "city") {
 //       setForm({
 //         ...form,
@@ -220,7 +219,6 @@
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-blue-200 flex items-center justify-center p-4 font-inter">
 //       <div className="max-w-4xl w-full bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-//         {/* Language Selector */}
 //         <div className="flex justify-end mb-2">
 //           <select
 //             value={language}
@@ -232,7 +230,6 @@
 //           </select>
 //         </div>
 
-//         {/* Header */}
 //         <div className="mb-6 text-center">
 //           <FiUserPlus className="text-blue-500 text-5xl mx-auto mb-3" />
 //           <h2 className="text-2xl font-bold text-gray-900">{t.title}</h2>
@@ -252,7 +249,7 @@
 //                 name={field.name}
 //                 type={field.type}
 //                 placeholder={field.label}
-//                 value={form[field.name as keyof VoterFormState]}
+//                 value={form[field.name as keyof VoterFormState] as string}
 //                 onChange={handleChange}
 //                 required
 //                 className="w-full px-3 py-2.5 border border-gray-200 rounded-lg"
@@ -412,7 +409,7 @@
 //             </label>
 //           </div>
 
-//           {/* Registered/New Registration Place */}
+//           {/* Registration Place */}
 //           {form.hasVoterId ? (
 //             <div className="col-span-1 md:col-span-2">
 //               <label className="block text-sm font-medium mb-1">{t.registeredPlace}</label>
@@ -542,6 +539,10 @@ const translations = {
     female: "Female",
     age: "Age in Years",
     phone: "Phone Number",
+    phonePrefix: "Prefix",
+    phoneRest: "7 digits",
+    phoneHint:
+      "Please enter a 9-digit Somaliland number. Example: 634740303 (prefix 63/65/67 + 7 digits).",
     city: "Select City",
     district: "Select District",
     address: "Address",
@@ -558,6 +559,8 @@ const translations = {
     validAgeError: "Please enter a valid age.",
     otherCity: "Other City (Please specify)",
     districtInput: "District",
+    phoneInvalid:
+      "Phone must start with 63, 65, or 67 and have exactly 7 more digits (total 9). Example: 634740303.",
   },
   so: {
     title: "Diiwaan geli Codbixiye",
@@ -568,6 +571,10 @@ const translations = {
     female: "Dheddig",
     age: "Da'da (Sanado)",
     phone: "Lambarka Taleefanka",
+    phonePrefix: "Laba-dii hore (63/65/67)",
+    phoneRest: "7 tiro",
+    phoneHint:
+      "Fadlan u diwaan geli lambarka qaabkan 634740303 (laba-dii hore 63/65/67 + 7 tiro). Mahadsanid.",
     city: "Dooro Magaalada",
     district: "Dooro Degmada",
     address: "Cinwaanka",
@@ -580,10 +587,13 @@ const translations = {
     desiredRegistrationPlace: "Goobta uu rabo in uu bedesho",
     register: "Diiwaan geli Codbixiye",
     registering: "Waxaa la abuurayaa...",
-    success: "Codbixiyahaa si guul leh ayaad u diiwaangelisey!, Mahadsanid",
+    success:
+      "Codbixiyahaa si guul leh ayaad u diiwaangelisey!, Mahadsanid",
     validAgeError: "Fadlan geli da'd sax ah.",
     otherCity: "Magaalada kale (Fadlan caddee)",
     districtInput: "Degmada",
+    phoneInvalid:
+      "Lambarku waa inuu ku bilaabmaa 63, 65 ama 67, wuxuuna ahaanayaa 9 tiro (7 kale kadib). Tusaale: 634740303.",
   },
 };
 
@@ -593,7 +603,7 @@ interface VoterFormState {
   fullName: string;
   gender: string;
   age: string;
-  phoneNumber: string;
+  phoneNumber: string; // final combined 9-digit number
   city: string;
   otherCity: string;
   district: string;
@@ -607,6 +617,9 @@ interface VoterFormState {
   clanSubtitle: string;
 }
 
+const allowedPrefixes = ["63", "65", "67"] as const;
+type AllowedPrefix = (typeof allowedPrefixes)[number];
+
 const RegisterVoter: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -615,11 +628,12 @@ const RegisterVoter: React.FC = () => {
   const [language, setLanguage] = useState<Language>("so");
   const t = translations[language];
 
+  // Keep all data; add UI controls for phone prefix + rest (7 digits).
   const [form, setForm] = useState<VoterFormState>({
     fullName: "",
     gender: "",
     age: "",
-    phoneNumber: "",
+    phoneNumber: "", // will be composed from prefix+rest on submit and on change
     city: "",
     otherCity: "",
     district: "",
@@ -632,6 +646,10 @@ const RegisterVoter: React.FC = () => {
     clanTitle: "",
     clanSubtitle: "",
   });
+
+  // New UI-only pieces for phone
+  const [phonePrefix, setPhonePrefix] = useState<AllowedPrefix>("63"); // default 63
+  const [phoneRest, setPhoneRest] = useState<string>(""); // must be 7 digits
 
   useEffect(() => {
     if (success) {
@@ -648,52 +666,106 @@ const RegisterVoter: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
+
     if (name === "city") {
-      setForm({
-        ...form,
+      setForm((prev) => ({
+        ...prev,
         city: value,
         otherCity: "",
         district: "",
-      });
-    } else if (name === "clanTitle") {
-      setForm({
-        ...form,
+      }));
+      return;
+    }
+
+    if (name === "clanTitle") {
+      setForm((prev) => ({
+        ...prev,
         clanTitle: value,
         clanSubtitle: "",
-      });
-    } else if (type === "checkbox") {
-      const target = e.target as HTMLInputElement;
-      setForm({
-        ...form,
-        [name]: target.checked,
-      });
-    } else {
-      setForm({
-        ...form,
-        [name]: value,
-      });
+      }));
+      return;
     }
+
+    if (type === "checkbox") {
+      const target = e.target as HTMLInputElement;
+      setForm((prev) => ({
+        ...prev,
+        [name]: target.checked,
+      }));
+      return;
+    }
+
+    // Prevent user from directly typing phoneNumber (we control via prefix/rest),
+    // but keep compatibility if input name ever equals "phoneNumber"
+    if (name === "phoneNumber") {
+      return; // ignore; controlled by prefix/rest
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handlePhonePrefixChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPrefix = e.target.value as AllowedPrefix;
+    setPhonePrefix(newPrefix);
+    // update composed phoneNumber in form
+    setForm((prev) => ({
+      ...prev,
+      phoneNumber: `${newPrefix}${phoneRest}`,
+    }));
+  };
+
+  const handlePhoneRestChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // restrict to digits only and max length 7
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 7);
+    setPhoneRest(digits);
+    setForm((prev) => ({
+      ...prev,
+      phoneNumber: `${phonePrefix}${digits}`,
+    }));
+  };
+
+  const validPhone = (prefix: string, rest: string) => {
+    return (
+      allowedPrefixes.includes(prefix as AllowedPrefix) &&
+      /^[0-9]{7}$/.test(rest)
+    );
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // age validation
     const currentDate = new Date();
     const ageNumber = parseInt(form.age, 10);
     if (isNaN(ageNumber) || ageNumber < 0 || ageNumber > 120) {
       toast.error(t.validAgeError);
       return;
     }
+
+    // phone validation
+    if (!validPhone(phonePrefix, phoneRest)) {
+      toast.error(t.phoneInvalid);
+      return;
+    }
+
     const birthYear = currentDate.getFullYear() - ageNumber;
     const dateOfBirth = new Date(
       birthYear,
       currentDate.getMonth(),
       currentDate.getDate()
     );
+
     const payload = {
       ...form,
+      // ensure we send the composed 9-digit number
+      phoneNumber: `${phonePrefix}${phoneRest}`,
       dateOfBirth: dateOfBirth.toISOString(),
       city: form.city === "Other" ? form.otherCity : form.city,
     };
+
     dispatch(createVoter(payload));
   };
 
@@ -717,15 +789,20 @@ const RegisterVoter: React.FC = () => {
           <p className="text-gray-600 text-sm">{t.subtitle}</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form
+          onSubmit={handleSubmit}
+          className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        >
           {[
             { name: "fullName", type: "text", label: t.fullName },
             { name: "age", type: "number", label: t.age },
-            { name: "phoneNumber", type: "text", label: t.phone },
+            // phone moved to custom UI below; keep row alignment by skipping here
             { name: "address", type: "text", label: t.address },
           ].map((field) => (
             <div key={field.name}>
-              <label className="block text-sm font-medium mb-1">{field.label}</label>
+              <label className="block text-sm font-medium mb-1">
+                {field.label}
+              </label>
               <input
                 name={field.name}
                 type={field.type}
@@ -737,6 +814,43 @@ const RegisterVoter: React.FC = () => {
               />
             </div>
           ))}
+
+          {/* Phone Number (prefix select + 7 digit input) */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium mb-1">
+              {t.phone}
+            </label>
+            <div className="flex gap-3">
+              <select
+                aria-label={t.phonePrefix}
+                value={phonePrefix}
+                onChange={handlePhonePrefixChange}
+                className="w-24 px-3 py-2.5 border border-gray-200 rounded-lg bg-white"
+              >
+                {allowedPrefixes.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+
+              <input
+                aria-label={t.phoneRest}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={7}
+                placeholder={t.phoneRest}
+                value={phoneRest}
+                onChange={handlePhoneRestChange}
+                required
+                className="flex-1 px-3 py-2.5 border border-gray-200 rounded-lg"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {t.phoneHint}
+            </p>
+          </div>
 
           {/* Gender */}
           <div>
@@ -777,7 +891,9 @@ const RegisterVoter: React.FC = () => {
           {/* Other City */}
           {form.city === "Other" && (
             <div>
-              <label className="block text-sm font-medium mb-1">{t.otherCity}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.otherCity}
+              </label>
               <input
                 name="otherCity"
                 type="text"
@@ -793,7 +909,9 @@ const RegisterVoter: React.FC = () => {
           {/* District */}
           {form.city && form.city !== "Other" ? (
             <div>
-              <label className="block text-sm font-medium mb-1">{t.district}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.district}
+              </label>
               <select
                 name="district"
                 value={form.district}
@@ -813,7 +931,9 @@ const RegisterVoter: React.FC = () => {
             </div>
           ) : form.city === "Other" ? (
             <div>
-              <label className="block text-sm font-medium mb-1">{t.districtInput}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.districtInput}
+              </label>
               <input
                 name="district"
                 type="text"
@@ -848,7 +968,9 @@ const RegisterVoter: React.FC = () => {
           {/* Sub-clan */}
           {form.clanTitle && (
             <div>
-              <label className="block text-sm font-medium mb-1">{t.subclan}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.subclan}
+              </label>
               <select
                 name="clanSubtitle"
                 value={form.clanSubtitle}
@@ -893,7 +1015,9 @@ const RegisterVoter: React.FC = () => {
           {/* Registration Place */}
           {form.hasVoterId ? (
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium mb-1">{t.registeredPlace}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.registeredPlace}
+              </label>
               <input
                 name="registeredPlace"
                 type="text"
@@ -906,7 +1030,9 @@ const RegisterVoter: React.FC = () => {
             </div>
           ) : (
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium mb-1">{t.newRegistrationPlace}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.newRegistrationPlace}
+              </label>
               <input
                 name="newRegistrationPlace"
                 type="text"
@@ -921,7 +1047,9 @@ const RegisterVoter: React.FC = () => {
 
           {form.wantsToChangeRegistration && (
             <div className="col-span-1 md:col-span-2">
-              <label className="block text-sm font-medium mb-1">{t.desiredRegistrationPlace}</label>
+              <label className="block text-sm font-medium mb-1">
+                {t.desiredRegistrationPlace}
+              </label>
               <input
                 name="desiredRegistrationPlace"
                 type="text"
@@ -957,3 +1085,4 @@ const RegisterVoter: React.FC = () => {
 };
 
 export default RegisterVoter;
+
